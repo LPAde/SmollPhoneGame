@@ -10,6 +10,7 @@ namespace Assets.Project.Scripts
 
         [Header("Player Stats")]
         [SerializeField] private float strength;
+        [SerializeField] private float minDistance;
 
         void Start()
         {
@@ -43,6 +44,9 @@ namespace Assets.Project.Scripts
 
             if (ballPosX < 0)
                 ballPosX *= -1;
+
+            if (ballPosX > minDistance)
+                return;
 
             float ballModifier = 1 / (1 + ballPosX);
 

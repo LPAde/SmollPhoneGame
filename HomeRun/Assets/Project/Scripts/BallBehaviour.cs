@@ -11,7 +11,7 @@ namespace Assets.Project.Scripts
         [SerializeField] private GameObject ballFollowCam;
         [SerializeField] private Vector2 startVector;
         [SerializeField] private Vector2 startVelocity;
-
+        
         [Header("Properties")]
         [SerializeField] private Rigidbody2D rigid;
 
@@ -66,6 +66,12 @@ namespace Assets.Project.Scripts
         /// <param name="force"> The direction and strength you want the force to be send. </param>
         public void AddForce(Vector2 force)
         {
+            // Ensure there are no negatives that hurt velocity.
+            if (rigid.velocity.x < 0)
+                rigid.velocity = new Vector2(0, rigid.velocity.y);
+            if (rigid.velocity.y < 0)
+                rigid.velocity = new Vector2(rigid.velocity.x, 0);
+
             rigid.AddForce(force);
         }
 

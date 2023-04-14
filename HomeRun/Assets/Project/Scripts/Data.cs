@@ -23,7 +23,8 @@ namespace Assets.Project.Scripts
         [SerializeField] internal string name;
         [SerializeField] internal string description;
         [SerializeField] internal Sprite icon;
-        [SerializeField] internal int level;
+        [SerializeField] internal byte level;
+        [SerializeField] internal int cost;
         [SerializeField] internal List<float> modifier;
     }
 }

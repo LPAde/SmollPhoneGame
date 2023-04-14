@@ -2,60 +2,76 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallBehaviour : MonoBehaviour
+namespace Assets.Project.Scripts
 {
-    public static BallBehaviour Instance;
-
-    [SerializeField] private GameObject ballFollowCam;
-    [SerializeField] private Vector2 startVector;
-    [SerializeField] private Vector2 startVelocity;
-
-    [Header("Properties")]
-    [SerializeField] private Rigidbody2D rigid;
-
-    private void Awake()
+    public class BallBehaviour : MonoBehaviour
     {
-        if (Instance != null)
-            Destroy(Instance);
+        public static BallBehaviour Instance;
 
-        Instance = this;
-    }
+        [SerializeField] private GameObject ballFollowCam;
+        [SerializeField] private Vector2 startVector;
+        [SerializeField] private Vector2 startVelocity;
 
-    private void Start()
-    {
-        startVector = transform.position;
-    }
+        [Header("Properties")]
+        [SerializeField] private Rigidbody2D rigid;
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        private void Awake()
         {
-            rigid.gravityScale = 0;
-            transform.position = startVector;
-            ballFollowCam.SetActive(false);
+            if (Instance != null)
+                Destroy(Instance);
+
+            Instance = this;
         }
 
-        if (rigid.gravityScale == 1)
-            return;
+        private void Start()
+        {
+            startVector = transform.position;
+        }
 
-        rigid.velocity = startVelocity;
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                rigid.gravityScale = 0;
+                transform.position = startVector;
+                ballFollowCam.SetActive(false);
+            }
 
-        if (transform.position.x < -1)
-            transform.position = startVector;
-    }
+            if (rigid.gravityScale == 1)
+                return;
 
-    public void Initialize()
-    {
-        rigid.gravityScale = 1;
-        ballFollowCam.SetActive(true);
-    }
+            rigid.velocity = startVelocity;
 
-    /// <summary>
-    /// Adds force to the ball.
-    /// </summary>
-    /// <param name="force"> The direction and strength you want the force to be send. </param>
-    public void AddForce(Vector2 force)
-    {
-        rigid.AddForce(force);
+            if (transform.position.x < -1)
+                transform.position = startVector;
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.CompareTag("Finish"))
+            {
+                Finish();
+            }
+        }
+
+        public void Initialize()
+        {
+            rigid.gravityScale = 1;
+            ballFollowCam.SetActive(true);
+        }
+
+        /// <summary>
+        /// Adds force to the ball.
+        /// </summary>
+        /// <param name="force"> The direction and strength you want the force to be send. </param>
+        public void AddForce(Vector2 force)
+        {
+            rigid.AddForce(force);
+        }
+
+        private void Finish()
+        {
+
+        }
     }
 }

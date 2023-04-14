@@ -2,53 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerShot : MonoBehaviour
+namespace Assets.Project.Scripts
 {
-    [SerializeField] private BallBehaviour ball;
-
-    [Header("Player Stats")]
-    [SerializeField] private float strength;
-
-    void Start()
+    public class PlayerShot : MonoBehaviour
     {
-        ball = BallBehaviour.Instance;
-    }
+        [SerializeField] private BallBehaviour ball;
 
+        [Header("Player Stats")]
+        [SerializeField] private float strength;
 
-    void Update()
-    {
-        if (Input.touchSupported)
+        void Start()
         {
-            if (Input.touchCount == 1)
-                ShootBall(Input.touches[0].position);
+            ball = BallBehaviour.Instance;
         }
-        else
+
+
+        void Update()
         {
-            if (Input.GetMouseButtonDown(0))
-                ShootBall(Input.mousePosition);
+            if (Input.touchSupported)
+            {
+                if (Input.touchCount == 1)
+                    ShootBall(Input.touches[0].position);
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                    ShootBall(Input.mousePosition);
+            }
         }
-    }
 
-    /// <summary>
-    /// Shoots the ball based on the input position.
-    /// </summary>
-    /// <param name="inputPixelPosition"> Position of the input in pixel coordinates. </param>
-    private void ShootBall(Vector2 inputPixelPosition)
-    {
-        // Setup.
-        Vector2 inputWorldPosition = Camera.main.ScreenToWorldPoint(inputPixelPosition);
-        float ballPosX = ball.transform.position.x;
+        /// <summary>
+        /// Shoots the ball based on the input position.
+        /// </summary>
+        /// <param name="inputPixelPosition"> Position of the input in pixel coordinates. </param>
+        private void ShootBall(Vector2 inputPixelPosition)
+        {
+            // Setup.
+            Vector2 inputWorldPosition = Camera.main.ScreenToWorldPoint(inputPixelPosition);
+            float ballPosX = ball.transform.position.x;
 
-        if (ballPosX < 0)
-            ballPosX *= -1;
+            if (ballPosX < 0)
+                ballPosX *= -1;
 
-        float ballModifier = 1 / (1 + ballPosX);
+            float ballModifier = 1 / (1 + ballPosX);
 
-        // Calculations.
-        Vector2 shootVector = inputWorldPosition.normalized * strength * ballModifier;
+            // Calculations.
+            Vector2 shootVector = inputWorldPosition.normalized * strength * ballModifier;
 
-        // Action.
-        ball.Initialize();
-        ball.AddForce(shootVector);
+            // Action.
+            ball.Initialize();
+            ball.AddForce(shootVector);
+        }
     }
 }

@@ -1,24 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class CollisionObject : MonoBehaviour
+namespace Assets.Project.Scripts
 {
-    [SerializeField] private Animator anim;
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    public abstract class CollisionObject : MonoBehaviour
     {
-        if (collision.CompareTag("Ball"))
-        { 
-            DoSomething();
+        [SerializeField] private Animator anim;
 
-            // Either plays animation or destroys itself.
-            if (anim == null)
-                Destroy(gameObject);
-            else
-                anim.SetTrigger("Hit");
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.CompareTag("Ball"))
+            {
+                DoSomething();
+
+                // Either plays animation or destroys itself.
+                if (anim == null)
+                    Destroy(gameObject);
+                else
+                    anim.SetTrigger("Hit");
+            }
         }
-    }
 
-    protected abstract void DoSomething();
+        protected abstract void DoSomething();
+    }
 }

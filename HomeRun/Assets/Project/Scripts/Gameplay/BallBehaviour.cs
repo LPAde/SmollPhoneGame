@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Project.Scripts
 {
@@ -38,12 +39,17 @@ namespace Assets.Project.Scripts
             }
 
             if (rigid.gravityScale == 1)
-                return;
+            {
+                if (rigid.velocity == Vector2.zero)
+                    SceneManager.LoadScene(0);
+            }
+            else
+            {
+                rigid.velocity = startVelocity;
 
-            rigid.velocity = startVelocity;
-
-            if (transform.position.x < -1)
-                transform.position = startVector;
+                if (transform.position.x < -1)
+                    transform.position = startVector;
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -66,18 +72,19 @@ namespace Assets.Project.Scripts
         /// <param name="force"> The direction and strength you want the force to be send. </param>
         public void AddForce(Vector2 force)
         {
+            print("force start");
             // Ensure there are no negatives that hurt velocity.
             if (rigid.velocity.x < 0)
-                rigid.velocity = new Vector2(0, rigid.velocity.y);
+                rigid.velocity = new Vector2(0.1f, rigid.velocity.y);
             if (rigid.velocity.y < 0)
-                rigid.velocity = new Vector2(rigid.velocity.x, 0);
-
+                rigid.velocity = new Vector2(rigid.velocity.x, 0.1f);
+            print("actual force start");
             rigid.AddForce(force);
         }
 
         private void Finish()
         {
-
+            SceneManager.LoadScene(0);
         }
     }
 }

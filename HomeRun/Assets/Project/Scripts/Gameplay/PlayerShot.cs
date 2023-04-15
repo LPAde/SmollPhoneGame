@@ -52,7 +52,7 @@ namespace Assets.Project.Scripts
 
             // Calculations.
             Vector2 shootVector = inputWorldPosition.normalized * strength * ballModifier;
-
+            print("try forcing");
             // Action.
             ball.Initialize();
             ball.AddForce(shootVector);

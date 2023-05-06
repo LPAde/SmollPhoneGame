@@ -1,20 +1,18 @@
+using Assets.Project.Scripts.Gameplay;
 using UnityEngine;
 
 namespace Assets.Project.Scripts
 {
-    public abstract class CollisionObject : MonoBehaviour
+    public abstract class CollisionObject : Upgradable
     {
         [SerializeField] private Animator anim;
 
         [Header("Spawning")]
         [SerializeField] private SpawnHeights spawnHeight;
-        [SerializeField] private float maxDistance;
-        [SerializeField] private float minDistance;
-        [SerializeField] private float waggleFactor;
+        [SerializeField] private int spawnChance;
 
         public SpawnHeights SpawnHeight => spawnHeight;
-        public float MaxDistance => maxDistance;
-        public float MinDistance => minDistance;
+        public int SpawnChance => spawnChance;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -30,22 +28,23 @@ namespace Assets.Project.Scripts
             }
         }
 
-        public void Waggle()
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y + Random.Range(-waggleFactor, waggleFactor));
-
-            if (transform.position.y < 0)
-                Destroy(gameObject);
-        }
-
         protected abstract void DoSomething();
+
+        /// <summary>
+        /// Multiplies the spawn chance with set value.
+        /// </summary>
+        /// <param name="multiplier"> What you want the spawn chance to be multiplied with. </param>
+        public void MultiplySpawnChance(int multiplier)
+        {
+            spawnChance *= multiplier;
+        }
     }
 }
 
 public enum SpawnHeights
 {
-    Everywhere,
-    Ground,
-    Sky,
-    Galaxy
+    Everywhere = 0,
+    Ground = 1,
+    Sky = 2,
+    Galaxy = 3
 }

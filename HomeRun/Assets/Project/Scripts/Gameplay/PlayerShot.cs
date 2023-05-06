@@ -1,22 +1,26 @@
+using Assets.Project.Scripts.Gameplay;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Project.Scripts
 {
-    public class PlayerShot : MonoBehaviour
+    public class PlayerShot : Upgradable
     {
         [SerializeField] private BallBehaviour ball;
+        [SerializeField] private GameManager gm;
 
         [Header("Player Stats")]
         [SerializeField] private float strength;
+        [SerializeField] private List<float> multipliers;
         [SerializeField] private float minDistance;
 
-        void Start()
+        protected override void Start()
         {
+            base.Start();
+
             ball = BallBehaviour.Instance;
         }
-
 
         void Update()
         {
@@ -52,10 +56,17 @@ namespace Assets.Project.Scripts
 
             // Calculations.
             Vector2 shootVector = inputWorldPosition.normalized * strength * ballModifier;
-            print("try forcing");
+            
             // Action.
             ball.Initialize();
             ball.AddForce(shootVector);
+
+            gm.gameObject.SetActive(true);
+        }
+
+        protected override void Upgrade(int Level)
+        {
+            strength *= multipliers[Level];
         }
     }
 }

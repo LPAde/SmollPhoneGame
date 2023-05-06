@@ -98,12 +98,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc8c481a58896b34da13af26ed14da41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 91c99e91ab00a3541a553208a64f1b23, type: 2}
+  upgrade: 0
   anim: {fileID: 0}
   spawnHeight: 2
-  maxDistance: 30
-  minDistance: 5
-  waggleFactor: 5
+  spawnChance: 5
   force: {x: 400, y: 400}
+  modifiers:
+  - 1
+  - 1
+  - 1
+  - 1
 --- !u!70 &6833587388572572900
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

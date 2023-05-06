@@ -32,17 +32,28 @@ namespace Assets.Project.Scripts
         {
             return levels[index];
         }
+
+        public Upgrade GetLevel(Upgrades upgrade)
+        {
+            for (int i = 0; i < levels.Count; i++)
+            {
+                if (levels[i].upgrade == upgrade)
+                    return levels[i];
+            }
+
+            return null;
+        }
     }
 
     [Serializable]
     public class Upgrade
     {
+        [SerializeField] internal Upgrades upgrade;
         [SerializeField] internal string name;
         [SerializeField] internal string description;
         [SerializeField] internal Sprite icon;
         [SerializeField] private int level;
         [SerializeField] internal List<int> cost;
-        [SerializeField] internal List<float> modifier;
 
         public int Level => level;
 
@@ -50,5 +61,16 @@ namespace Assets.Project.Scripts
         {
             level++;
         }
+    }
+
+    [Serializable]
+    public enum Upgrades
+    {
+        Strength,
+        Magnet,
+        MoneyWorth,
+        Bouncyness,
+        ForceStrength,
+        MoreFans
     }
 }

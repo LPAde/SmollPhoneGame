@@ -98,13 +98,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f01dc50012012e43815268ccd591743, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 91c99e91ab00a3541a553208a64f1b23, type: 2}
+  upgrade: 2
   anim: {fileID: 0}
   spawnHeight: 0
-  maxDistance: 6
-  minDistance: 1
-  waggleFactor: 8
-  data: {fileID: 11400000, guid: 91c99e91ab00a3541a553208a64f1b23, type: 2}
+  spawnChance: 50
   coinAmount: 1
+  multipliers: 01000000020000000300000004000000
 --- !u!58 &1494049004901432554
 CircleCollider2D:
   m_ObjectHideFlags: 0

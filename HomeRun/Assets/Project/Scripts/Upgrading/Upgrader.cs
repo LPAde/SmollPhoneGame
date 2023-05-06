@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Assets.Project.Scripts.Upgrading
@@ -11,6 +12,7 @@ namespace Assets.Project.Scripts.Upgrading
         [SerializeField] private Data data;
 
         [Header("UI Stuff")]
+        [SerializeField] private List<Button> buttons;
         [SerializeField] private List<TextMeshProUGUI> names;
         [SerializeField] private List<TextMeshProUGUI> descriptions;
         [SerializeField] private List<TextMeshProUGUI> costs;
@@ -34,6 +36,11 @@ namespace Assets.Project.Scripts.Upgrading
             }
         }
 
+        public void StartPlay()
+        {
+            SceneManager.LoadScene(1);
+        }
+
         private void Initialize()
         {
             for (int i = 0; i < names.Count; i++)
@@ -47,6 +54,17 @@ namespace Assets.Project.Scripts.Upgrading
             }
 
             currentMoney.text = data.CoinAmount.ToString();
+
+            UpdateInfo();
+        }
+
+        private void UpdateInfo()
+        {
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                if (!data.CheckLevelPurchasable(i))
+                    buttons[i].interactable = false;
+            }
         }
     }
 }

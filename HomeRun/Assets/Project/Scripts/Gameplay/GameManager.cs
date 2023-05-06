@@ -7,10 +7,12 @@ namespace Assets.Project.Scripts
     {
         [Header("Spawning")]
         [SerializeField] private List<float> heights;
-        [SerializeField] private List<int> heightReps;
-        [SerializeField] private float minSpawnPos;
-        [SerializeField] private float maxSpawnPos;
         [SerializeField] private List<CollisionObject> spawnableObjects;
+        [SerializeField] private GameObject spawnPosition;
+        [SerializeField] private List<float> threshholds;
+        [SerializeField] private float positionMultiplier;
+        [SerializeField] private float maxTimer;
+        [SerializeField] private float timer;
 
         [Header("Garbage Collector Optimization")]
         [SerializeField] private int reps;
@@ -18,86 +20,121 @@ namespace Assets.Project.Scripts
         [SerializeField] private float maxSpawnPosY;
         [SerializeField] private int heightIndex;
         [SerializeField] private float lastXCoord;
-        [SerializeField] private CollisionObject obj;
+        [SerializeField] private List<CollisionObject> objs;
         [SerializeField] private Vector2 spawnPos;
         [SerializeField] private int count;
 
-        private void Start()
-        {
-            SpawnObjects();
-        }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.A))
-                SpawnObjects();
+            AdjustSpawnPosition(BallBehaviour.Instance.Rigid.velocity);
+
+            if (timer < 0)
+            {
+                timer = maxTimer;
+                var objs = GetPalpableCollisionObjects(GetCurrentHeight());
+                SpawnObjects(objs, BallBehaviour.Instance.Rigid.velocity.y);
+            }
+            else
+            {
+                timer -= Time.deltaTime;
+            }
         }
 
-        private void SpawnObjects()
+        private void SpawnObjects(List<CollisionObject> objs, float yVelocity)
         {
-            for (int i = 0; i < spawnableObjects.Count; i++)
+            // Decide on Object
+            int maxSpawnChance = 0;
+            CollisionObject obj = null;
+
+            for (int i = 0; i < objs.Count; i++)
             {
-                if (spawnableObjects[i].MaxDistance == 0)
-                    continue;
+                maxSpawnChance += objs[i].SpawnChance;
+            }
 
-                lastXCoord = minSpawnPos;
-                spawnPos = new Vector2(Random.Range(lastXCoord, lastXCoord + spawnableObjects[i].MaxDistance), 0);
+            int spawnID = Random.Range(0, maxSpawnChance);
 
-                switch (spawnableObjects[i].SpawnHeight)
+            for (int i = 0; i < objs.Count; i++)
+            {
+                spawnID -= objs[i].SpawnChance;
+
+                if(spawnID <= 0)
                 {
-                    case SpawnHeights.Everywhere:
-
-                        reps = heightReps[3];
-                        startSpawnPosY = heights[0];
-                        maxSpawnPosY = heights[3];
-
-                        break;
-
-                    case SpawnHeights.Ground:
-
-                        reps = heightReps[0];
-                        startSpawnPosY = heights[0];
-                        maxSpawnPosY = heights[0];
-
-                        break;
-
-                    case SpawnHeights.Sky:
-
-                        reps = heightReps[1];
-                        startSpawnPosY = heights[1];
-                        maxSpawnPosY = heights[2];
-
-                        break;
-
-                    case SpawnHeights.Galaxy:
-
-                        reps = heightReps[2];
-                        startSpawnPosY = heights[2];
-                        maxSpawnPosY = heights[3];
-
-                        break;
-                }
-
-                heightIndex = (int)((maxSpawnPosY - startSpawnPosY) / reps);
-                spawnPos.y = startSpawnPosY;
-
-                for (int j = 0; j < reps; j++)
-                {
-                    lastXCoord = minSpawnPos;
-                    spawnPos.x = Random.Range(lastXCoord, lastXCoord + spawnableObjects[i].MaxDistance);
-                    spawnPos.y += heightIndex;
-
-                    while (maxSpawnPos - lastXCoord > 5)
-                    {
-                        obj = Instantiate(spawnableObjects[i], spawnPos, Quaternion.identity, transform);
-                        count++;
-                        obj.GetComponent<CollisionObject>().Waggle();
-
-                        lastXCoord = Random.Range(lastXCoord, lastXCoord + spawnableObjects[i].MaxDistance);
-                        spawnPos.x = lastXCoord + spawnableObjects[i].MinDistance;
-                    }
+                    obj = objs[i];
+                    break;
                 }
             }
+
+            // Set Spawn Position of Object
+            Vector2 pos = Vector2.zero;
+            
+            pos = (Vector2)spawnPosition.transform.position + (Random.insideUnitCircle * positionMultiplier);
+            
+
+            // Ensuring no negativ spawn position.
+            if((pos.y < 0 || obj.SpawnHeight == SpawnHeights.Ground) || (pos.y < 0 && obj.SpawnHeight == SpawnHeights.Ground))
+            {
+                pos = new Vector2(pos.x, 0);
+
+                // Descrease spawns when at ground.
+                timer += .5f;
+            }
+
+            if(pos.x < BallBehaviour.Instance.transform.position.x)
+            {
+                pos = new Vector2(BallBehaviour.Instance.transform.position.x + 15, pos.y);
+            }
+
+            // Spawn the Object
+            Instantiate(obj, pos, Quaternion.identity, transform);
+        }
+
+        /// <summary>
+        /// Gets the current height of the ball and converts it to the enum.
+        /// </summary>
+        /// <returns> The current height as a enum. </returns>
+        private SpawnHeights GetCurrentHeight()
+        {
+            SpawnHeights currentHeight = SpawnHeights.Everywhere;
+
+            for (int i = heights.Count-1; i > 0; i--)
+            {
+                if (BallBehaviour.Instance.transform.position.y > heights[i])
+                    break;
+
+                currentHeight = (SpawnHeights)i;
+            }
+            
+            return currentHeight;
+        }
+
+        /// <summary>
+        /// Creates a list of spawnable collision objects based on the current height.
+        /// </summary>
+        /// <param name="currentHeight"> The current height in enum. </param>
+        /// <returns> A list of collision objects. </returns>
+        private List<CollisionObject> GetPalpableCollisionObjects(SpawnHeights currentHeight)
+        {
+            objs.Clear();
+
+            for (int i = 0; i < spawnableObjects.Count; i++)
+            {
+                if (spawnableObjects[i].SpawnHeight == currentHeight || spawnableObjects[i].SpawnHeight == SpawnHeights.Everywhere)
+                    objs.Add(spawnableObjects[i]);
+            }
+
+            return objs;
+        }
+
+        private void AdjustSpawnPosition(Vector2 playerVelo)
+        {
+            // Y.
+            if (playerVelo.y > threshholds[0])
+                playerVelo.y = threshholds[0];
+            else if (playerVelo.y < threshholds[1])
+                playerVelo.y = threshholds[1];
+
+            spawnPosition.transform.position = new Vector3(spawnPosition.transform.position.x, BallBehaviour.Instance.transform.position.y + playerVelo.y, 0);
         }
     }
 }
